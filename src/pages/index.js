@@ -17,38 +17,16 @@ function Index() {
       <Helmet>
         <title>Gatsby + Node.js (TypeScript) API</title>
       </Helmet>
-      <h1>Gatsby + Node.js (TypeScript) API</h1>
-      <h2>
-        Deployed with{' '}
-        <a
-          href="https://vercel.com/docs"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          Vercel
-        </a>
-        !
+      <h1>Hi, my name is Andrew Ritter</h1>
+      <h2>I am a creative technologist
       </h2>
-      <p>
-        <a
-          href="https://github.com/vercel/vercel/tree/master/examples/gatsby"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          This project
-        </a>{' '}
-        is a <a href="https://www.gatsbyjs.org/">Gatsby</a> app with two
-        directories, <code>/src</code> for static content and <code>/api</code>{' '}
-        which contains a serverless{' '}
-        <a href="https://nodejs.org/en/">Node.js (TypeScript)</a> function. See{' '}
-        <a href="/api/date">
-          <code>api/date</code> for the Date API with Node.js (TypeScript)
-        </a>
-        .
+      <p>For work: I am a fullstack web developer focusing on javascript technologies like React, redux, Express, & NextJS
       </p>
+      <p>I also dabble in photography, film, creative writing & complexity.</p>
+     
       <br />
-      <h2>The date according to Node.js (TypeScript) is:</h2>
-      <p>{date ? date : 'Loading date...'}</p>
+      <h3>The future of the web and its interfacing is also very interesting to me.</h3>
+      <p>One of the projects I am working on in this regard is to learn Rust while programming a small collection of Raspberry Pi's to act as my home "Hyperspace".</p>
     </main>
   );
 }
