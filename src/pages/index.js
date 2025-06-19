@@ -41,8 +41,7 @@ function Index() {
 
       <section className="furthermore">
         <h4>Writing, reading and arithmetic</h4>
-        <p>The rhythm and the rhyme</p>
-        <p>and the plot turning over time.</p>
+        <p>The rhythm and the rhyme<br/>and the plot turning over time.</p>
       </section>
      <section className="explore">
       {/* add interactive form */}
