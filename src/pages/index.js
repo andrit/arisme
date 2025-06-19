@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import '../styles/index.css';
+// import Form from './form';
 
 function Index() {
   const [date, setDate] = useState(null);
@@ -40,8 +41,12 @@ function Index() {
 
       <section className="furthermore">
         <h4>Writing, reading and arithmetic</h4>
+        <p>The rhythm and the rhyme</p>
+        <p>and the plot turning over time.</p>
       </section>
-     
+     <section className="explore">
+      {/* add interactive form */}
+     </section>
     </main>
   );
 }
