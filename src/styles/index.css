@@ -52,3 +52,12 @@ header{
 .greeting:hover{
   filter: drop-shadow(0px 0px 50px #333);
 }
+
+.introduction p, .introduction h2 {
+  transition: filter .4s ease-out;
+  text-shadow: none;
+  
+}
+.introduction p:hover{
+  filter: drop-shadow(0px 10px 25px #333);
+}
