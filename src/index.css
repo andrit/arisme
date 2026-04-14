@@ -1,0 +1,403 @@
+/* ─── DESIGN SYSTEM ───────────────────────────────────────── */
+:root {
+  --bg:           #070808;
+  --bg-1:         #0d0e0e;
+  --bg-2:         #111313;
+  --fg:           #f0ead8;
+  --fg-muted:     #7a7468;
+  --fg-dim:       #3a3730;
+  --green:        #5c8f6a;
+  --green-light:  #7dba8e;
+  --green-glow:   rgba(92, 143, 106, 0.15);
+  --amber:        #c49a52;
+  --amber-light:  #e0b96e;
+  --ember:        #c9562e;
+  --border:       rgba(240, 234, 216, 0.06);
+  --border-hover: rgba(240, 234, 216, 0.14);
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-mono:    'JetBrains Mono', monospace;
+  --font-body:    'Outfit', system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:   cubic-bezier(0.87, 0, 0.13, 1);
+
+  /* ── Responsive spacing tokens ── */
+  --sp-section-y:   10rem;
+  --sp-section-x:   3rem;
+  --sp-hero-x:      3rem;
+  --sp-content-max: 1100px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sp-section-y: 5rem;
+    --sp-section-x: 1.25rem;
+    --sp-hero-x:    1.25rem;
+  }
+}
+
+/* ─── RESET ───────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: auto; /* Lenis handles this */
+  font-size: 16px;
+  cursor: default; /* keeps native cursor on scrollbar — body overrides this for page content */
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+  cursor: none;
+  /* Prevent iOS rubber-band fighting Lenis at page edges */
+  overscroll-behavior: none;
+}
+
+/* ─── CUSTOM CURSOR ───────────────────────────────────────── */
+.cursor-dot {
+  position: fixed;
+  top: 0; left: 0;
+  width: 6px; height: 6px;
+  background: var(--amber);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background 0.2s;
+}
+
+.cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(196, 154, 82, 0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s var(--ease-out-expo), height 0.3s var(--ease-out-expo), border-color 0.3s;
+}
+
+body:has(a:hover) .cursor-dot,
+body:has(button:hover) .cursor-dot {
+  width: 10px; height: 10px;
+  background: var(--green-light);
+}
+
+body:has(a:hover) .cursor-ring,
+body:has(button:hover) .cursor-ring {
+  width: 56px; height: 56px;
+  border-color: rgba(125, 186, 142, 0.5);
+}
+
+/* ─── SCROLLBAR ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; cursor: default; }
+::-webkit-scrollbar-track { background: var(--bg); cursor: default; }
+::-webkit-scrollbar-thumb {
+  background:    var(--green);
+  border-radius: 4px;
+  cursor:        default;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--green-light);
+}
+
+/* ─── TYPOGRAPHY ──────────────────────────────────────────── */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  letter-spacing: 0.08em;
+}
+
+/* ─── SELECTION ───────────────────────────────────────────── */
+::selection {
+  background: var(--green);
+  color: var(--bg);
+}
+
+/* ─── SECTIONS ────────────────────────────────────────────── */
+section {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── NOISE TEXTURE OVERLAY ───────────────────────────────── */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* ─── SECTION LABEL ───────────────────────────────────────── */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.section-label::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--green);
+}
+
+/* ─── LINK BASE ───────────────────────────────────────────── */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ─── UTILITY ─────────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
+
+/* Clip mask for text reveal */
+.clip-reveal {
+  overflow: hidden;
+  display: block;
+}
+
+.clip-reveal span {
+  display: block;
+  transform: translateY(110%);
+}
+
+/* Fade in utility */
+.fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+/* ─── SCROLLING MARQUEE ───────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+
+.marquee-track:hover { animation-play-state: paused; }
+
+/* ─── GLOW PULSE ──────────────────────────────────────────── */
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.8; }
+}
+
+/* ─── TOPOGRAPHIC LINES ───────────────────────────────────── */
+@keyframes topoFloat {
+  0%   { transform: translateY(0) scale(1); }
+  50%  { transform: translateY(-20px) scale(1.02); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* ─── MOBILE NAV OVERLAY ──────────────────────────────────── */
+.mobile-nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 490;
+  background: rgba(7, 8, 8, 0.97);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.mobile-nav-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-nav-overlay a {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 300;
+  color: var(--fg-muted);
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+
+.mobile-nav-overlay a:hover {
+  color: var(--amber);
+}
+
+/* Hamburger button */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: none;
+  padding: 8px;
+  background: none;
+  border: none;
+  z-index: 510;
+  position: relative;
+}
+
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--fg);
+  transition: transform 0.3s var(--ease-out-expo), opacity 0.3s;
+  transform-origin: center;
+}
+
+.hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+@media (max-width: 768px) {
+  .hamburger { display: flex; }
+  .desktop-nav-links { display: none; }
+}
+
+/* ─── ABOUT SECTION RESPONSIVE ────────────────────────────── */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+}
+
+.about-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+}
+
+@media (max-width: 768px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .about-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ─── CRAFT SECTION RESPONSIVE ────────────────────────────── */
+.craft-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .craft-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── CONTACT SECTION RESPONSIVE ─────────────────────────── */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
+
+/* ─── WORLDS SECTION RESPONSIVE ──────────────────────────── */
+.worlds-panel-row {
+  display: flex;
+  gap: 4rem;
+  align-items: center;
+  margin-bottom: 4rem;
+}
+
+@media (max-width: 768px) {
+  .worlds-panel-row {
+    flex-direction: column !important;
+    gap: 2rem;
+  }
+
+  .worlds-anim-wrap {
+    width: 100% !important;
+    height: 300px !important;
+  }
+}
+
+/* ─── SECTION DOTS TOUCH TARGETS ─────────────────────────── */
+.dot-btn {
+  /* Invisible 44×44 touch target around the small visual dot */
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* ─── REDUCED MOTION ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  /* CSS animations */
+  .marquee-track { animation: none; }
+  .cursor-dot, .cursor-ring { transition: none; }
+  .mobile-nav-overlay { transition: none; }
+  .hamburger span { transition: none; }
+
+  /* Clip reveal — show text immediately */
+  .clip-reveal span { transform: translateY(0) !important; }
+
+  /* Fade up — show immediately */
+  .fade-up { opacity: 1 !important; transform: none !important; }
+}
+
+/* ─── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  body { cursor: auto; }
+  .cursor-dot, .cursor-ring { display: none; }
+
+  /* Topo SVG too large for mobile — shrink and reposition */
+  .topo-svg {
+    width: 420px !important;
+    height: 420px !important;
+    right: -30% !important;
+  }
+}
