@@ -7,8 +7,8 @@ import { sendEmail } from '../utils/sendEmail'
 gsap.registerPlugin(ScrollTrigger)
 
 const LINKS = [
-  { label: 'GitHub',   href: 'https://github.com/andrit',       fa: 'fa-brands fa-github'   },
-  { label: 'LinkedIn', href: 'https://linkedin.com/in/andrewritterdeveloper',  fa: 'fa-brands fa-linkedin' },
+  { label: 'GitHub',   href: 'https://github.com/andrit', fa: 'fa-brands fa-github'   },
+  { label: 'LinkedIn', href: 'https://linkedin.com/in/andrewritterdeveloper', fa: 'fa-brands fa-linkedin' },
 ]
 
 // ─────────────────────────────────────────────────────────────────
@@ -110,7 +110,7 @@ function StaticView({ onOpen }) {
 // Mounts fresh → staggers in → submit → 'sent' | cancel → 'static'
 // ─────────────────────────────────────────────────────────────────
 function FormView({ onCancel, onSent }) {
-  const [fields, setFields] = useState({ name: '', email: '', message: '' })
+  const [fields, setFields] = useState({ name: '', email: '', message: '', _honey: '' })
   const [status, setStatus] = useState('idle') // 'idle' | 'sending'
   const [error,  setError]  = useState('')
   const isReadyToSubmit     = useTimeGate(3000)
@@ -155,7 +155,8 @@ function FormView({ onCancel, onSent }) {
   return (
     <form onSubmit={handleSubmit} noValidate>
       {/* Honeypot — invisible to humans, bots fill it */}
-      <input name="_honey" tabIndex={-1} aria-hidden="true" onChange={() => {}}
+      <input name="_honey" tabIndex={-1} aria-hidden="true"
+        value={fields._honey} onChange={handleChange}
         style={{ position: 'absolute', opacity: 0, height: 0, width: 0, pointerEvents: 'none' }} />
 
       <div ref={el => setItem(el, 0)} style={{ marginBottom: '2rem' }}>
