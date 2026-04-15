@@ -32,5 +32,8 @@
     "api/send.js": {
       "maxDuration": 10
     }
-  }
+  },
+  "installCommand": "npm install",
+  "buildCommand": "node_modules/.bin/vite build",
+  "outputDirectory": "dist"
 }
