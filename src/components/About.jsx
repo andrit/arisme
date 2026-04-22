@@ -28,56 +28,73 @@ const ALL_STATS = [
   { value: '100+',  label: 'Products Photographed'   },
   { value: '50+',   label: 'APIs Connected'          },
 ]
-const SLOT_COUNT   = 4
-const INTERVAL_MS  = 4500   // ms between each roll
-const ANIM_DURATION = 0.55  // seconds for slide transition
 
+const SLOT_COUNT    = 4
+const INTERVAL_MS   = 4500 // ms between each roll
+const ANIM_DURATION = 0.52 // seconds for slide transition
 
 // ── Rotating stat grid ────────────────────────────────────────
 // Slots hold indices into ALL_STATS. On each interval one slot
 // rolls its content out (up) and a new stat rolls in (from below).
 const StatGrid = forwardRef(function StatGrid(_, ref) {
-  // Active indices — first SLOT_COUNT stats start visible
-  const [slots, setSlots] = useState(() =>
-    Array.from({ length: SLOT_COUNT }, (_, i) => i)
-  )
-  // Which pool index comes next (cycles through ALL_STATS)
-  const nextIdx    = useRef(SLOT_COUNT)
-  // Which slot was last animated (avoid repeating same slot)
-  const lastSlot   = useRef(-1)
-  // Refs to the inner content divs for GSAP targeting
-  const cellRefs   = useRef([])
-  const reduced    = prefersReducedMotion()
+  // slots holds the ALL_STATS index currently showing in each of the 4 columns
+  const [slots, setSlots]   = useState([0, 1, 2, 3])
+
+  // pendingRef: queue of stat indices NOT currently visible.
+  // Initialised after mount; null until then so rolls are skipped safely.
+  const pendingRef  = useRef(null)
+
+  // lastSlot: which slot column was most recently animated — never repeat it
+  const lastSlotRef = useRef(-1)
+
+  // refs to the inner content div inside each column (GSAP target)
+  const cellRefs    = useRef([])
+
+  const reduced = prefersReducedMotion()
+
+  // Build the initial pending queue once on mount
+  useEffect(() => {
+    // Indices 4–11 are not yet visible; shuffle so the order is random
+    const remaining = ALL_STATS.map((_, i) => i).slice(SLOT_COUNT)
+    for (let i = remaining.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[remaining[i], remaining[j]] = [remaining[j], remaining[i]]
+    }
+    pendingRef.current = remaining
+  }, [])
 
   const roll = useCallback(() => {
     if (reduced) return
+    if (!pendingRef.current || pendingRef.current.length === 0) return
 
-    // Pick a random slot that isn't the one we just animated
-    let slot
-    do { slot = Math.floor(Math.random() * SLOT_COUNT) }
-    while (slot === lastSlot.current)
-    lastSlot.current = slot
+    // ── Pick a slot that is NOT the one we just animated ──────────────
+    const available = [0, 1, 2, 3].filter(s => s !== lastSlotRef.current)
+    const slot = available[Math.floor(Math.random() * available.length)]
+    lastSlotRef.current = slot
 
-    const cell     = cellRefs.current[slot]
+    const cell = cellRefs.current[slot]
     if (!cell) return
 
-    const incoming = nextIdx.current % ALL_STATS.length
-    nextIdx.current++
+    // ── Dequeue the next incoming stat ────────────────────────────────
+    const incoming = pendingRef.current.shift()
 
-    // Slide current content up and out
+    // ── Animate out, swap content, animate in ─────────────────────────
     gsap.to(cell, {
       y: '-105%',
       opacity: 0,
       duration: ANIM_DURATION,
       ease: 'power3.in',
       onComplete: () => {
-        // Swap stat index
+        // Update React state (changes text inside the cell)
         setSlots(prev => {
+          const outgoing = prev[slot]
+          // The outgoing stat rejoins the queue at the back
+          pendingRef.current.push(outgoing)
           const next = [...prev]
           next[slot] = incoming
           return next
         })
-        // Reset to below, then slide up into place
+        // Reset position below, then slide up into place
         gsap.set(cell, { y: '105%', opacity: 0 })
         gsap.to(cell, {
           y: '0%',
@@ -118,10 +135,10 @@ const StatGrid = forwardRef(function StatGrid(_, ref) {
               padding:    '2.5rem',
               background: 'var(--bg)',
               textAlign:  'center',
-              overflow:   'hidden',  // clips the slide in/out
+              overflow:   'hidden',
             }}
           >
-            {/* Inner wrapper — GSAP animates translateY on this */}
+            {/* GSAP animates translateY on this inner wrapper */}
             <div ref={el => { cellRefs.current[slotIdx] = el }}>
               <div style={{
                 fontFamily:   'var(--font-display)',
@@ -130,14 +147,18 @@ const StatGrid = forwardRef(function StatGrid(_, ref) {
                 color:        'var(--amber)',
                 lineHeight:   1,
                 marginBottom: '0.5rem',
-              }}>{s.value}</div>
+              }}>
+                {s.value}
+              </div>
               <div style={{
                 fontFamily:    'var(--font-mono)',
                 fontSize:      '0.68rem',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color:         'var(--fg-muted)',
-              }}>{s.label}</div>
+              }}>
+                {s.label}
+              </div>
             </div>
           </div>
         )
@@ -145,6 +166,7 @@ const StatGrid = forwardRef(function StatGrid(_, ref) {
     </div>
   )
 })
+
 
 export default function About() {
   const sectionRef = useRef(null)
