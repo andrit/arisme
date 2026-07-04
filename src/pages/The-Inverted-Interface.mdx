@@ -1,0 +1,63 @@
+# The Inverted Interface
+
+Picture a door in the dark. On either side of it, a room full of restless air — molecules tearing around at every speed, a chaos with no preference, no direction, no heat you could name. And at the door, a small attentive figure with one hand on the latch. It does no pushing. It doesn't stir the air or spend itself against the storm. It only watches, and chooses: the fast ones through, the slow ones back. Open, closed. Open, closed. And slowly — impossibly — one room begins to warm while the other cools. Order, teased out of noise, by a hand that never did any work at all.
+
+In 1867 James Clerk Maxwell put that figure in a letter, not to write a fantasy but to pick a fight with the second law of thermodynamics. Entropy always increases, the law says; disorder is the direction of time. Maxwell's point was that this is a truth about crowds, not about individuals — that a being small enough and informed enough, stationed at a gate, could sort a system into order without spending a joule of effort. Lord Kelvin named the being a demon, and it has haunted physics for a century and a half. Because there turned out to be a catch, and the catch is the interesting part: the demon isn't getting order for free. It pays — not in labor, but in information. The cost of the whole enterprise lives in the knowing and the deciding at the gate. The demon's real job was never to move the molecules. It was to choose.
+
+I've come to think that's the exact shape of the right way to build software with an AI — and that almost everyone has the figure in the wrong place.
+
+We keep trying to be the molecules. We sit inside the room and push the air around by hand, writing every line, and reach for the AI as a faster arm to push with. Or, lately, we're tempted to hand the whole room over to the storm — let an autonomous agent churn unattended and hope order falls out. Both miss what Maxwell saw. The molecules can move themselves; the tool is genuinely good at that energetic, tireless work. What the system is missing isn't more pushing. It's a demon at the gate.
+
+That gate is the interface. And it's currently installed backwards.
+
+---
+
+## Not backwards. Orthogonal.
+
+So we reach for the obvious fix: turn it around. If the human shouldn't run the machine, let the machine run itself — hand it the room and step back. That instinct is the whole current excitement about autonomous agents.
+
+It's wrong, and it's wrong in an interesting way. Reversing the arrow doesn't repair the interface. It keeps the one broken part and swaps who holds it. Someone still stands inside the room, pushing. The problem was never *which* of them pushes. It's that anyone is pushing at all.
+
+Engineers have a name for the real fix, and it isn't reversal. It's Inversion of Control. You don't hand the thread to the human or to the machine. You give it to the frame around them, and let the frame call each one only when it should be called. The machine becomes what it always was — a tool among tools, picked up when there's work to move. The human steps to the gate.
+
+There's a hard reason it has to run this way and not the other. A tool can't be held accountable. IBM said it out loud in 1979, on a training slide that has aged better than almost anything else from that decade: *a computer can never be held accountable, therefore a computer must never make a management decision.* Accountability needs someone who can answer for the call, and a machine can answer for nothing. Hand it the gate and you haven't delegated authority — you've abandoned it. The demon's seat is the one seat a tool can never take.
+
+---
+
+## The demon's real job is choosing
+
+Give the machine the work it is actually good at and the list is short. Two things. It writes code, tirelessly and well. And it learns a system by living inside its accumulated context — every decision, every dead end, the shape of the whole thing held at once without fatigue. That is the energetic labor of software, the molecule-pushing. Let the tool push molecules.
+
+What's left is the demon's job, and it was always the harder one. Not labor. Choice. The informed decision at the boundary that turns motion into direction.
+
+This is the part worth slowing down for. An interface was never really a screen, or a set of buttons, or a chat box — those are just its most recent costume. An interface is a threshold: the seam where two orders meet and have to be reconciled, and something has to stand there and reconcile them. Maxwell's demon is the purest interface there is. It stands exactly at the line between chaos and order and does nothing but decide what crosses. That is what the designer becomes. Not a manager of the machine, not a reviewer of its output, but the figure at the seam, deciding at each boundary what passes. The gate is not where you supervise the work. It is where the work takes its shape.
+
+And this is a third way to build software, which is why it deserves a name of its own. For fifty years there have been two. Write it yourself, line by line. Or, lately, call an assistant to write it faster. Both keep you inside the room, pushing. The inverted interface is neither: you don't push, and you don't delegate the pushing. You stand at the gate and choose. That isn't a better assistant. It's a different stance toward the machine.
+
+---
+
+## The inversion is natural
+
+None of this asks a developer to become something new. It asks them to do the oldest part of the job, and to stop being interrupted by the newest.
+
+Strip away the typing and look at what good developers have always done. They write documentation. They plan before they build. They reach for design patterns — decisions someone already made well, kept ready to reuse. They communicate with precision, because a vague sentence is a bug filed upstream. They think in strategy before syntax. Most of all, they think in systems. Every bit of that is gate-work. Every bit of it is deciding what crosses. The code was always the thing downstream of the deciding — the molecules, moving once the choice was made.
+
+So the inversion doesn't invert the developer. It restores them to the part of the work that was theirs all along, and hands the rest to a tool built to carry it.
+
+And that word — tool — is the whole reframe. An architect does not argue with their CAD system or defer to it. They configure it, they operate it, and they remain the author of the design. CAD is where the drafting labor happens; the architect is where the building is decided, and nobody confuses the two. Configure the AI the same way: a power tool added to a toolset that already exists, installed at the gate, with the design authority kept exactly where it has always been.
+
+---
+
+## What it costs, and what it needs
+
+The demon is not magic, and it does not work for free. It pays — just not in labor. It pays in information: in the knowing and the deciding at the gate. That cost is the one thing that can never be automated, because it is the accountable choice, and accountability has to belong to someone. The judgment is the price, and the price is the human's to pay.
+
+Notice where that leaves you as the tool gets better. The cost lives at the gate, so it scales with the number of gates — not with how much the machine produces. The machine can double its output and your job does not double; there are still the same decisions, at the same boundaries. Every gain in the tool's power just raises the place you stand to decide from. You are not being automated toward the exit. You are being moved to the gate.
+
+But a tool that carries this much of the work has to be built to carry it. One that forgets everything between sessions can't hold the context the whole approach depends on — you'd be back to pushing molecules by hand, re-briefing a stranger every morning. The gate needs a room built around it: one that keeps the context, holds the method, and lets the tool run between your decisions without losing the thread.
+
+What that room looks like, and why it is harder to build than it sounds, is the rest of this series.
+
+---
+
+*First in a series on the inverted interface — building software with the AI as a tool among tools, and the human at the gate.*
