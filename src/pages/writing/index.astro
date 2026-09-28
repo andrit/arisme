@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro'
+import PostCard from '../../components/PostCard.astro'
+import RemotePosts from '../../islands/RemotePosts'
+import { publishedPosts } from '../../lib'
+const posts = await publishedPosts()
+---
+<Base title="Writing" description="Essays on building software with AI at the gate, product development, and systems.">
+  <section class="section">
+    <div class="wrap">
+      <div class="section-label">Writing</div>
+      <h1>Thinking <em class="accent">out loud</em>.</h1>
+      <p class="lede" style="margin: 1.5rem 0 3rem">
+        Long-form pieces live here first. Some are also published on Medium and Substack —
+        those are listed below with a link out. <a class="link" href="/rss.xml">RSS</a>
+      </p>
+      <div class="list">
+        {posts.map((p) => (
+          <PostCard title={p.data.title} href={p.data.canonical ?? `/writing/${p.id}`} date={p.data.date} excerpt={p.data.excerpt} />
+        ))}
+      </div>
+      <RemotePosts client:idle limit={20} />
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,513 @@
+---
+import { publishedPosts, publishedWork } from '../lib'
+
+// Home page — low-fi redesign, ported from the alt-home-2 mockup. Self-contained: its own
+// <head>, styles (is:global) and scripts (is:inline); does NOT use Base.astro or the dark
+// global.css. The rest of the site (Header/Footer, /work, /writing, articles) still uses the
+// old dark design and would need its own pass.
+
+// Home carousels are driven by the content collections — drafts show in `astro dev`, hidden in prod.
+const studies = await publishedWork()   // ordered by frontmatter `order`
+const posts = (await publishedPosts()).slice(0, 6)   // 6 most recent; full list at /writing
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Andrew Ritter — Product development and engineering</title>
+<meta name="description" content="Andrew Ritter — product development and engineering. Writing on building software with AI at the gate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<!-- fonts for the ported dark About band -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;500&display=swap">
+<style is:global>
+  :root{
+    color-scheme: light;
+    --paper:#FDFDFB;
+    --ink:#1B1A16;
+    --muted:#75726A;
+    --rule:#E6E4DC;
+    --accent:#C1442E;
+    --serif:"Newsreader", Georgia, "Times New Roman", serif;
+    --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    --measure:62ch;
+    --wrap:900px;
+    --gap:20px;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+  [id]{scroll-margin-top:88px}  /* keep hash targets clear of the sticky header */
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--serif);
+    font-size:19px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%}
+  .wrap{max-width:var(--wrap); margin:0 auto; padding:0 28px}
+
+  .mark{display:inline-block; color:var(--ink)}
+  .eyebrow{
+    display:flex; align-items:center; gap:.6rem;
+    font-family:var(--mono); font-size:.72rem; font-weight:500;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+    margin:0;
+  }
+  .eyebrow .mark{width:15px; height:15px}
+
+  a{color:var(--accent); text-decoration:none; text-underline-offset:3px}
+  a:hover{text-decoration:underline}
+  a:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:2px}
+
+  .site-header{position:sticky; top:0; z-index:50; background:var(--paper); border-bottom:1px solid var(--rule)}
+  .site-header .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    padding-top:22px; padding-bottom:22px; gap:1rem;
+  }
+  .logo{display:flex; align-items:center; gap:.6rem; color:var(--ink); font-weight:400}
+  .logo .mark{width:26px; height:26px}
+  .logo .name{font-family:var(--mono); font-size:.8rem; letter-spacing:.14em; text-transform:uppercase}
+  .site-header nav{display:flex; gap:1.6rem}
+  .site-header nav a{
+    font-family:var(--mono); font-size:.74rem; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--muted);
+  }
+  .site-header nav a:hover{color:var(--ink); text-decoration:none}
+
+  section{padding:74px 0}
+  section + section{border-top:1px solid var(--rule)}
+  .measure{max-width:var(--measure)}
+  p{margin:0 0 1.15rem}
+  p:last-child{margin-bottom:0}
+
+  h1{
+    font-family:var(--serif); font-weight:500; font-size:clamp(2.6rem,6vw,4rem);
+    line-height:1.04; letter-spacing:-.01em; text-wrap:balance; margin:0 0 1.4rem;
+  }
+  .hero .lede{font-size:1.28rem; color:var(--muted); max-width:52ch; margin:0}
+  h2{
+    font-family:var(--serif); font-weight:500; font-size:clamp(1.7rem,3.4vw,2.2rem);
+    line-height:1.12; text-wrap:balance; margin:0 0 1.5rem; letter-spacing:-.01em;
+  }
+  .turn{max-width:var(--measure)}
+  .turn p{font-size:1.12rem}
+  em, i{font-style:italic}
+  .drop{color:var(--muted)}
+
+  /* carousel */
+  .carousel-head{
+    display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.4rem;
+  }
+  .controls{display:flex; gap:.5rem}
+  .controls button{
+    width:38px; height:38px; border:1px solid var(--rule); background:var(--paper);
+    color:var(--ink); font-family:var(--mono); font-size:1rem; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; padding:0;
+    transition:border-color .12s ease, color .12s ease;
+  }
+  .controls button:hover:not(:disabled){border-color:var(--ink)}
+  .controls button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .controls button:disabled{opacity:.32; cursor:default}
+
+  .track{
+    display:flex; gap:var(--gap); overflow-x:auto;
+    scroll-snap-type:x mandatory; scroll-behavior:smooth;
+    scrollbar-width:none; -ms-overflow-style:none;
+    margin:0 -2px; padding:2px;
+  }
+  .track::-webkit-scrollbar{display:none}
+  .card{
+    flex:0 0 calc((100% - 2*var(--gap)) / 3);
+    scroll-snap-align:start; min-width:0;
+    border:1px solid var(--rule); background:var(--paper);
+    padding:22px; display:flex; flex-direction:column; gap:.7rem;
+  }
+  .card .cmark{width:16px; height:16px; opacity:.8}
+  .card .ctitle{font-family:var(--serif); font-weight:600; font-size:1.2rem; line-height:1.2}
+  .card .cdesc{color:var(--muted); font-size:1rem; margin:0; flex:1}
+  .card .cmeta{
+    font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--muted); font-variant-numeric:tabular-nums;
+  }
+  .card.dummy{border-style:dashed}
+  a.card{color:inherit; text-decoration:none; transition:border-color .12s ease}
+  a.card:hover{border-color:var(--ink); text-decoration:none}
+  a.card:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .more-link{display:inline-block; margin-top:1.5rem; font-family:var(--mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); text-decoration:none}
+  .more-link:hover{color:var(--ink)}
+  .more-link:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+
+  @media (max-width:820px){ .card{flex-basis:calc((100% - var(--gap)) / 2)} }   /* 2-up */
+  @media (max-width:600px){ .card{flex-basis:100%} }                            /* 1-up on mobile, swipe for next */
+  @media (prefers-reduced-motion: reduce){ .track, html{scroll-behavior:auto} }
+
+  .contact h2{margin-bottom:1rem}
+  .channels{
+    display:flex; flex-wrap:wrap; gap:1.4rem; margin-top:1.6rem;
+    font-family:var(--mono); font-size:.8rem; letter-spacing:.06em;
+  }
+  footer{border-top:1px solid var(--rule); padding:28px 0}
+  footer .wrap{display:flex; align-items:center; justify-content:space-between; gap:1rem}
+  footer .mark{width:18px; height:18px; opacity:.75}
+  footer .fine{font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; color:var(--muted); text-transform:uppercase}
+
+  /* ---- responsive: whole page ---- */
+  @media (max-width:900px){
+    section{padding:64px 0}
+  }
+  @media (max-width:640px){
+    body{font-size:18px}
+    .wrap{padding:0 20px}
+    section{padding:52px 0}
+    :root{--gap:14px}
+    h1{font-size:clamp(2.05rem,8.5vw,3rem)}
+    .hero .lede{font-size:1.1rem}
+    h2{font-size:clamp(1.5rem,5.5vw,1.9rem)}
+    .turn p{font-size:1.06rem}
+  }
+  @media (max-width:600px){
+    .site-header .wrap{gap:.75rem}
+    .site-header nav{gap:.85rem}
+    .site-header nav a{font-size:.66rem; letter-spacing:.08em}
+    .logo .name{font-size:.72rem; letter-spacing:.1em}
+    .carousel-head{align-items:flex-start}
+    footer .wrap{flex-direction:column; align-items:flex-start; gap:.8rem}
+  }
+  @media (max-width:400px){
+    .wrap{padding:0 16px}
+    .channels{gap:1rem}
+    .controls button{width:34px; height:34px}
+    .site-header nav{gap:.6rem}
+    .site-header nav a{font-size:.6rem; letter-spacing:.05em}
+    .logo .name{font-size:.68rem}
+  }
+
+  /* ---- dark About band (ported from the Astro build's About.astro; self-contained + scoped) ---- */
+  .about-dark{
+    --bg:#070808; --bg-1:#0d0e0e; --bg-2:#111313;
+    --fg:#f0ead8; --fg-muted:#7a7468;
+    --green:#5c8f6a; --amber:#c49a52;
+    --border:rgba(240,234,216,0.08); --border-hover:rgba(240,234,216,0.18);
+    --font-display:"Cormorant Garamond", Georgia, serif;
+    --font-mono:"JetBrains Mono", ui-monospace, monospace;
+    --font-body:"Outfit", system-ui, sans-serif;
+    --ease-out:cubic-bezier(0.16,1,0.3,1);
+    background:var(--bg); color:var(--fg);
+    font-family:var(--font-body); font-weight:300; line-height:1.7;
+    border-top:none;
+  }
+  .about-dark ::selection{background:rgba(196,154,82,0.35)}
+  .about-dark h2{font-family:var(--font-display); font-weight:300; line-height:1.1; font-size:clamp(2.2rem,4.5vw,3.6rem); margin:0}
+  .about-dark h3{font-family:var(--font-display); font-weight:300; line-height:1.1; font-size:clamp(1.5rem,2.5vw,2rem)}
+  .about-dark .accent, .about-dark em.accent{font-style:italic; color:var(--amber)}
+  .about-dark .section-label{
+    font-family:var(--font-mono); font-size:.68rem; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--green); display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;
+  }
+  .about-dark .section-label::before{content:""; display:block; width:32px; height:1px; background:var(--green)}
+  .about-dark .mono{font-family:var(--font-mono); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-muted)}
+  .about-dark .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:4rem}
+  .about-dark .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:2rem}
+  .about-dark .about-copy p{color:var(--fg-muted); font-size:1.05rem; line-height:1.9; margin-bottom:1.25rem}
+  .about-dark .about-copy blockquote{
+    margin-top:2rem; padding-left:1.25rem; border-left:2px solid var(--amber);
+    font-family:var(--font-display); font-size:1.35rem; font-style:italic; line-height:1.5; color:var(--fg-muted);
+  }
+  .about-dark .stats{display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin:4rem 0}
+  .about-dark .stat{padding:1.75rem 0; text-align:center; overflow:hidden}
+  .about-dark .stat-inner{transition:transform .52s cubic-bezier(0.7,0,0.84,0), opacity .52s}
+  .about-dark .stat-inner.is-out{transform:translateY(-105%); opacity:0}
+  .about-dark .stat-inner.is-below{transform:translateY(105%); opacity:0; transition:none}
+  .about-dark .stat-inner.is-in{transition:transform .52s var(--ease-out), opacity .52s}
+  .about-dark .stat + .stat{border-left:1px solid var(--border)}
+  .about-dark .stat-value{font-family:var(--font-display); font-size:clamp(2.2rem,4vw,3.2rem); color:var(--amber); line-height:1; margin-bottom:.5rem}
+  .about-dark .worlds .world-label{color:var(--green); margin-bottom:1rem}
+  .about-dark .world h3{margin-bottom:.75rem}
+  .about-dark .world p{color:var(--fg-muted); font-size:.98rem; line-height:1.8; margin-bottom:1.25rem}
+  .about-dark .tags{display:flex; flex-wrap:wrap; gap:.5rem}
+  .about-dark .tag{font-family:var(--font-mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:var(--fg-muted); border:1px solid var(--border); padding:.3rem .6rem}
+  @media (max-width:860px){ .about-dark .grid-2, .about-dark .grid-3{grid-template-columns:1fr; gap:2.5rem} }
+  @media (max-width:600px){ .about-dark .stats{grid-template-columns:1fr} .about-dark .stat + .stat{border-left:none; border-top:1px solid var(--border)} }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 100 100">
+    <rect x="8" y="8" width="84" height="84" fill="none" stroke="currentColor" stroke-width="5"/>
+    <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="5"/>
+    <polygon points="50,33 66,61 34,61" fill="var(--accent)"/>
+  </symbol>
+</svg>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="#top">
+      <svg class="mark" aria-hidden="true"><use href="#mark"/></svg>
+      <span class="name">Andrew Ritter</span>
+    </a>
+    <nav aria-label="Primary">
+      <a href="#work">Work</a>
+      <a href="#writing">Writing</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow" style="margin-bottom:1.75rem"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg> Product · Engineering · Design</p>
+      <h1>An interface is a function of the data.</h1>
+      <p class="lede">Design tells the story; the data supplies the words.</p>
+    </div>
+  </section>
+
+  <section class="turn-section" id="the-turn">
+    <div class="wrap turn">
+      <p class="eyebrow" style="margin-bottom:1.4rem"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg> Adaptive Self-Efficacy</p>
+      <p>Twenty years ago I walked into a college career office with a graphic-design course load and no real lane. I walked out with a job shooting product photos for an ad company — which also needed a catalogue and a website, so I learned those too.</p>
+      <p>That set the pattern: I took the work that was there and learned what it needed. Design, web, photo, video, a few years around film sets, writing the whole way through. In 2015 I went full-stack, and for ten years I've written the code.</p>
+      <p>For those ten years the job was building web applications. Now I'm combining my experiences to power a turn towards product management and development.</p>
+      <p>The deciding was always the part that mattered: what to build, for whom, what to refuse. The typing was how you found out whether you'd decided well. Now the machine takes the typing, and the deciding is what's left. So I'm reaching for it on purpose.</p>
+      <p>Three things taught me how to decide, and for years I thought they were three careers.</p>
+      <p><strong>Story</strong> — from writing and film: there's a story in everything, and the idea behind a product has one of its own.</p>
+      <p><strong>Interface</strong> — from design and front end: not decoration on a system, but where the system and a person meet. And it's a function of the data — decide the shape of the data and you've decided the product; the screen just reports it.</p>
+      <p><strong>Data</strong> — from ten years full stack: what's kept, what's derived, what must never be deleted. Get the shape right and the interface falls out of it.</p>
+      <p>There's a fourth thing that isn't a trade: how the product gets made — process and operations. And that's where the ground actually moved.</p>
+      <p>Because computing only ever does one thing: it builds the next abstraction on the last and hands it to you through an interface. Assembly hid the machine, the compiler hid assembly, the framework hid the compiler — each layer letting you decide more and type less. The language model is the next layer. Plain language became a way to program, so how we make software changed as much as the software. Nothing is ending. The abstraction took one more step — onto the interface itself, the thing I spent a decade learning to read.</p>
+      <p>The same shape is everywhere: an app's meaning is cut out by use, one loop at a time; a career's judgment emerges from years of accumulated craft; computing's abstractions emerge from piled-up patterns. Stock becomes flow. It's why this turn feels like arriving, not leaving.</p>
+    </div>
+  </section>
+
+  <section id="work">
+    <div class="wrap">
+      <div class="carousel" data-carousel role="group" aria-label="Product studies">
+        <div class="carousel-head">
+          <p class="eyebrow"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg> Product Studies</p>
+          <div class="controls">
+            <button type="button" data-prev aria-label="Previous study">&#8249;</button>
+            <button type="button" data-next aria-label="Next study">&#8250;</button>
+          </div>
+        </div>
+        <div class="track" tabindex="0" aria-label="Product studies, scrollable">
+          {studies.map((w) => (
+            <a class="card" href={`/work/${w.id}`}>
+              <svg class="cmark mark" aria-hidden="true"><use href="#mark"/></svg>
+              <div class="ctitle">{w.data.title}</div>
+              <p class="cdesc">{w.data.tagline}</p>
+              <div class="cmeta">{w.data.role}</div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="writing">
+    <div class="wrap">
+      <div class="carousel" data-carousel role="group" aria-label="Writing">
+        <div class="carousel-head">
+          <p class="eyebrow"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg> Writing</p>
+          <div class="controls">
+            <button type="button" data-prev aria-label="Previous writing">&#8249;</button>
+            <button type="button" data-next aria-label="Next writing">&#8250;</button>
+          </div>
+        </div>
+        <div class="track" tabindex="0" aria-label="Writing, scrollable">
+          {posts.map((p) => (
+            <a class="card" href={p.data.canonical ?? `/writing/${p.id}`}>
+              <svg class="cmark mark" aria-hidden="true"><use href="#mark"/></svg>
+              <div class="ctitle">{p.data.title}</div>
+              <p class="cdesc">{p.data.excerpt}</p>
+              <div class="cmeta">Essay</div>
+            </a>
+          ))}
+        </div>
+      </div>
+      <a class="more-link" href="/writing">All writing →</a>
+    </div>
+  </section>
+
+  <section id="about" class="about-dark">
+    <div class="wrap">
+      <div class="grid-2 about-top">
+        <div>
+          <div class="section-label">About</div>
+          <h2>I don't just write code — <em class="accent">I architect</em> experiences.</h2>
+        </div>
+        <div class="about-copy">
+          <p>
+            I'm a web developer who sees systems everywhere — in codebases, in narratives,
+            in the trails that wind through fog-covered ridges. I believe the best interfaces
+            tell stories, and the best stories have elegant architecture.
+          </p>
+          <p>
+            By day I build scalable web applications with the kind of obsessive attention to
+            detail that comes from treating every project like a chapter in an unfolding world.
+            By night, I fill notebooks with strange maps and stranger ideas.
+          </p>
+          <blockquote>"The map is not the territory, but a good map makes you want to explore."</blockquote>
+        </div>
+      </div>
+
+      <div class="stats" id="about-stats" data-interval="4500">
+        <div class="stat"><div class="stat-inner"><div class="stat-value">8+</div><div class="mono">Years Building</div></div></div>
+        <div class="stat"><div class="stat-inner"><div class="stat-value">200+</div><div class="mono">Miles Hiked</div></div></div>
+        <div class="stat"><div class="stat-inner"><div class="stat-value">1</div><div class="mono">Unfinished Novel</div></div></div>
+      </div>
+
+      <div class="grid-3 worlds">
+        <div class="world">
+          <div class="mono world-label">01 — The Storyteller</div>
+          <h3>Every system has a narrative</h3>
+          <p>I've been building fictional worlds since before I could write code. The skills that make a story immersive — pacing, tension, consequence — are the same ones that make software feel alive. The veins of every system are full of story.</p>
+          <div class="tags">
+            <span class="tag">World-building</span>
+            <span class="tag">Interactive Fiction</span>
+            <span class="tag">Narrative Design</span>
+            <span class="tag">Lore</span>
+          </div>
+        </div>
+        <div class="world">
+          <div class="mono world-label">02 — The Systems Thinker</div>
+          <h3>Complexity made navigable</h3>
+          <p>I'm drawn to the hidden architecture of things — organizing the chaos to invoke emergent connections between systems and ideas that aren't obvious until rendered visible. I see feedback loops in everything and can't resist asking what's governing the governors.</p>
+          <div class="tags">
+            <span class="tag">Knowledge Graphs</span>
+            <span class="tag">Obsidian</span>
+            <span class="tag">Second-brain</span>
+            <span class="tag">Zettelkasten</span>
+          </div>
+        </div>
+        <div class="world">
+          <div class="mono world-label">03 — The Trail Seeker</div>
+          <h3>The wilderness is a debugger</h3>
+          <p>Solvitur ambulando. It is solved by walking. Hiking has taught me how to carry only what matters, navigate in the absence of signals, and find clarity where discomfort lives. My best architectural decisions happen at elevation, far from a keyboard.</p>
+          <div class="tags">
+            <span class="tag">Mountains</span>
+            <span class="tag">Navigation</span>
+            <span class="tag">Exploration</span>
+            <span class="tag">Rivers</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="wrap measure">
+      <p class="eyebrow" style="margin-bottom:1.4rem"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg> Contact</p>
+      <h2>Building product with AI in the loop? Tell me what you're working on.</h2>
+      <div class="channels">
+        <a href="mailto:hello@andrewritter.me">hello@andrewritter.me</a>
+        <a href="#">LinkedIn</a>
+        <a href="https://github.com/andrit" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <svg class="mark" aria-hidden="true"><use href="#mark"/></svg>
+    <span class="fine">Andrew Ritter — Lo-Fi redesign draft 2</span>
+  </div>
+</footer>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll('[data-carousel]').forEach(function (root) {
+      var track = root.querySelector('.track');
+      var prev = root.querySelector('[data-prev]');
+      var next = root.querySelector('[data-next]');
+      var controls = root.querySelector('.controls');
+      if (!track || !prev || !next) return;
+
+      function step() {
+        var card = track.querySelector('.card');
+        if (!card) return track.clientWidth;
+        var cs = getComputedStyle(track);
+        var gap = parseFloat(cs.columnGap || cs.gap || '0') || 0;
+        return card.getBoundingClientRect().width + gap; // exactly one card
+      }
+      function update() {
+        var overflow = track.scrollWidth - track.clientWidth > 1;
+        if (controls) controls.hidden = !overflow; // hide controls when everything fits (≤3 up = none)
+        var max = track.scrollWidth - track.clientWidth - 1;
+        prev.disabled = track.scrollLeft <= 0;
+        next.disabled = track.scrollLeft >= max;
+      }
+      prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+      next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+      track.addEventListener('scroll', function () { requestAnimationFrame(update); }, { passive: true });
+      window.addEventListener('resize', function () { requestAnimationFrame(update); });
+      update();
+    });
+  })();
+</script>
+
+<script is:inline>
+  // Rotating stat banner (ported from About.astro). Every INTERVAL one slot (never
+  // the same slot twice in a row) slides its stat up and out, and the next queued
+  // stat slides in from below; the outgoing stat rejoins the back of the queue.
+  // Static under prefers-reduced-motion.
+  (function () {
+    var OUT_MS = 520;
+    function start(grid) {
+      var pool = [{value:"8+",label:"Years Building"},{value:"200+",label:"Miles Hiked"},{value:"1",label:"Unfinished Novel"},{value:"40+",label:"Collaborations"},{value:"∞",label:"Stories Told"},{value:"∞",label:"Problems Reframed"},{value:"7",label:"Domains Mapped"},{value:"1000+",label:"Lines of Code"},{value:"5",label:"Videos Produced"},{value:"20+",label:"Cities Explored"},{value:"100+",label:"Products Photographed"},{value:"50+",label:"APIs Connected"}];
+      var interval = Number(grid.dataset.interval) || 4500;
+      var cells = Array.prototype.slice.call(grid.querySelectorAll('.stat-inner'));
+      if (cells.length === 0 || pool.length <= cells.length) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var visible = cells.map(function (_, i) { return i; });
+      var pending = pool.map(function (_, i) { return i; }).slice(cells.length);
+      for (var i = pending.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = pending[i]; pending[i] = pending[j]; pending[j] = tmp;
+      }
+      var lastSlot = -1;
+
+      function roll() {
+        if (document.hidden) return;
+        var choices = cells.map(function (_, i) { return i; }).filter(function (i) { return i !== lastSlot; });
+        var slot = choices[Math.floor(Math.random() * choices.length)];
+        lastSlot = slot;
+        var cell = cells[slot];
+        var incoming = pending.shift();
+        if (incoming === undefined) return;
+
+        cell.classList.add('is-out');
+        window.setTimeout(function () {
+          pending.push(visible[slot]);
+          visible[slot] = incoming;
+          var s = pool[incoming];
+          cell.querySelector('.stat-value').textContent = s.value;
+          cell.querySelector('.mono').textContent = s.label;
+
+          cell.classList.remove('is-out');
+          cell.classList.add('is-below');
+          void cell.offsetHeight; // commit the "below" position before transitioning up
+          cell.classList.remove('is-below');
+          cell.classList.add('is-in');
+          window.setTimeout(function () { cell.classList.remove('is-in'); }, OUT_MS);
+        }, OUT_MS);
+      }
+
+      window.setInterval(roll, interval);
+    }
+    var __g = document.getElementById('about-stats'); if (__g) start(__g);
+  })();
+</script>
+
+<!-- Vercel Web Analytics (enable it in the Vercel dashboard → Analytics) -->
+<script is:inline defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+---
+// Copy carried over verbatim from v1 Hero.jsx — edits are a later pass.
+const tags = ['Web Developer', 'Storyteller', 'Systems Thinker', 'Trail Seeker']
+---
+<section id="hero" class="hero">
+  <div class="wrap">
+    <div class="section-label">&lt;hello world /&gt;</div>
+    <h1>
+      Building <em class="accent">Worlds</em>,<br />
+      <span class="hero-sub">one commit at a time.</span>
+    </h1>
+    <p class="lede">
+      I craft experiences across the digital and the physical —
+      from systems and interfaces to stories and mountain ridges.
+    </p>
+    <div class="tags">
+      {tags.map((t) => <span class="tag">{t}</span>)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero { padding: clamp(5rem, 14vh, 9rem) 0 var(--sp-section-y); }
+  .hero h1 { font-size: clamp(3.2rem, 8vw, 7rem); margin-bottom: 2rem; }
+  .hero-sub { color: var(--fg-muted); font-size: 0.72em; }
+  .hero .lede { margin-bottom: 2.5rem; }
+</style>

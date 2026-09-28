@@ -1,0 +1,25 @@
+---
+interface Props {
+  title: string
+  href: string
+  date: Date
+  excerpt?: string
+  source?: 'site' | 'medium' | 'substack'
+  external?: boolean
+}
+const { title, href, date, excerpt, source = 'site', external = false } = Astro.props
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+const sourceLabel = { site: 'andrewritter.me', medium: 'Medium', substack: 'Substack' }[source]
+---
+<a class="card post-card" href={href} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
+  <div class="meta">
+    <time class="mono" datetime={date.toISOString()}>{fmt(date)}</time>
+    <span class="mono">{sourceLabel}{external ? ' ↗' : ''}</span>
+  </div>
+  <h3>{title}</h3>
+  {excerpt && <p>{excerpt}</p>}
+</a>
+
+<style>
+  .post-card h3 { font-size: clamp(1.4rem, 2.2vw, 1.8rem); }
+</style>

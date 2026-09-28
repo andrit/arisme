@@ -1,0 +1,177 @@
+---
+// Copy carried over verbatim from the v1 About + Worlds sections (the three "worlds" texts).
+const worlds = [
+  {
+    label: '01 — The Storyteller',
+    title: 'Every system has a narrative',
+    body:  `I've been building fictional worlds since before I could write code. The skills that make a story immersive — pacing, tension, consequence — are the same ones that make software feel alive. The veins of every system are full of story.`,
+    tags:  ['World-building', 'Interactive Fiction', 'Narrative Design', 'Lore'],
+  },
+  {
+    label: '02 — The Systems Thinker',
+    title: 'Complexity made navigable',
+    body:  `I'm drawn to the hidden architecture of things — organizing the chaos to invoke emergent connections between systems and ideas that aren't obvious until rendered visible. I see feedback loops in everything and can't resist asking what's governing the governors.`,
+    tags:  ['Knowledge Graphs', 'Obsidian', 'Second-brain', 'Zettelkasten'],
+  },
+  {
+    label: '03 — The Trail Seeker',
+    title: 'The wilderness is a debugger',
+    body:  `Solvitur ambulando. It is solved by walking. Hiking has taught me how to carry only what matters, navigate in the absence of signals, and find clarity where discomfort lives. My best architectural decisions happen at elevation, far from a keyboard.`,
+    tags:  ['Mountains', 'Navigation', 'Exploration', 'Rivers'],
+  },
+]
+
+// Rotating stats — the first SLOT_COUNT open the banner; the rest queue behind
+// them and roll in one at a time (see the script at the bottom of this file).
+const stats = [
+  { value: '8+',    label: 'Years Building' },
+  { value: '200+',  label: 'Miles Hiked' },
+  { value: '1',     label: 'Unfinished Novel' },
+  { value: '40+',   label: 'Collaborations' },
+  { value: '∞',     label: 'Stories Told' },
+  { value: '∞',     label: 'Problems Reframed' },
+  { value: '7',     label: 'Domains Mapped' },
+  { value: '1000+', label: 'Lines of Code' },
+  { value: '5',     label: 'Videos Produced' },
+  { value: '20+',   label: 'Cities Explored' },
+  { value: '100+',  label: 'Products Photographed' },
+  { value: '50+',   label: 'APIs Connected' },
+]
+const SLOT_COUNT = 3
+---
+<section id="about" class="section">
+  <div class="wrap">
+    <div class="grid-2 about-top">
+      <div>
+        <div class="section-label">About</div>
+        <h2>I don't just write code — <em class="accent">I architect</em> experiences.</h2>
+      </div>
+      <div class="about-copy">
+        <p>
+          I'm a web developer who sees systems everywhere — in codebases, in narratives,
+          in the trails that wind through fog-covered ridges. I believe the best interfaces
+          tell stories, and the best stories have elegant architecture.
+        </p>
+        <p>
+          By day I build scalable web applications with the kind of obsessive attention to
+          detail that comes from treating every project like a chapter in an unfolding world.
+          By night, I fill notebooks with strange maps and stranger ideas.
+        </p>
+        <blockquote>"The map is not the territory, but a good map makes you want to explore."</blockquote>
+      </div>
+    </div>
+
+    <div class="stats" data-stats={JSON.stringify(stats)} data-interval="4500">
+      {stats.slice(0, SLOT_COUNT).map((s) => (
+        <div class="stat">
+          <div class="stat-inner">
+            <div class="stat-value">{s.value}</div>
+            <div class="mono">{s.label}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="grid-3 worlds">
+      {worlds.map((w) => (
+        <div class="world">
+          <div class="mono world-label">{w.label}</div>
+          <h3>{w.title}</h3>
+          <p>{w.body}</p>
+          <div class="tags">
+            {w.tags.map((t) => <span class="tag">{t}</span>)}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-copy p { color: var(--fg-muted); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.25rem; }
+  .about-copy blockquote {
+    margin-top: 2rem;
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--amber);
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--fg-muted);
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin: 4rem 0;
+  }
+  .stat { padding: 1.75rem 0; text-align: center; overflow: hidden; }
+  .stat-inner { transition: transform 0.52s cubic-bezier(0.7, 0, 0.84, 0), opacity 0.52s; }
+  .stat-inner.is-out { transform: translateY(-105%); opacity: 0; }
+  .stat-inner.is-below { transform: translateY(105%); opacity: 0; transition: none; }
+  .stat-inner.is-in { transition: transform 0.52s var(--ease-out), opacity 0.52s; }
+  .stat + .stat { border-left: 1px solid var(--border); }
+  .stat-value { font-family: var(--font-display); font-size: clamp(2.2rem, 4vw, 3.2rem); color: var(--amber); line-height: 1; margin-bottom: 0.5rem; }
+  .world-label { color: var(--green); margin-bottom: 1rem; }
+  .world h3 { margin-bottom: 0.75rem; }
+  .world p { color: var(--fg-muted); font-size: 0.98rem; line-height: 1.8; margin-bottom: 1.25rem; }
+  @media (max-width: 600px) {
+    .stats { grid-template-columns: 1fr; }
+    .stat + .stat { border-left: none; border-top: 1px solid var(--border); }
+  }
+</style>
+
+<script>
+  // Rotating stat banner. Every INTERVAL one slot (never the same slot twice in
+  // a row) slides its stat up and out, and the next queued stat slides in from
+  // below. The outgoing stat rejoins the back of the queue. Static under
+  // prefers-reduced-motion.
+  const OUT_MS = 520
+
+  function start(grid: HTMLElement) {
+    const pool: { value: string; label: string }[] = JSON.parse(grid.dataset.stats ?? '[]')
+    const interval = Number(grid.dataset.interval) || 4500
+    const cells = Array.from(grid.querySelectorAll<HTMLElement>('.stat-inner'))
+    if (cells.length === 0 || pool.length <= cells.length) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const visible = cells.map((_, i) => i)
+    const pending = pool.map((_, i) => i).slice(cells.length)
+    for (let i = pending.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[pending[i], pending[j]] = [pending[j], pending[i]]
+    }
+    let lastSlot = -1
+
+    const roll = () => {
+      if (document.hidden) return
+      const choices = cells.map((_, i) => i).filter((i) => i !== lastSlot)
+      const slot = choices[Math.floor(Math.random() * choices.length)]
+      lastSlot = slot
+      const cell = cells[slot]
+      const incoming = pending.shift()
+      if (incoming === undefined) return
+
+      cell.classList.add('is-out')
+      window.setTimeout(() => {
+        pending.push(visible[slot])
+        visible[slot] = incoming
+        const s = pool[incoming]
+        cell.querySelector('.stat-value')!.textContent = s.value
+        cell.querySelector('.mono')!.textContent = s.label
+
+        cell.classList.remove('is-out')
+        cell.classList.add('is-below')
+        void cell.offsetHeight // commit the "below" position before transitioning up
+        cell.classList.remove('is-below')
+        cell.classList.add('is-in')
+        window.setTimeout(() => cell.classList.remove('is-in'), OUT_MS)
+      }, OUT_MS)
+    }
+
+    window.setInterval(roll, interval)
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-stats]').forEach(start)
+</script>

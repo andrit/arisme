@@ -1,0 +1,21 @@
+---
+import Base from '../../layouts/Base.astro'
+import WorkCard from '../../components/WorkCard.astro'
+import { publishedWork } from '../../lib'
+const work = await publishedWork()
+---
+<Base title="Work" description="Product-development case studies: the product thinking, the domain model, the decisions and what they cost.">
+  <section class="section">
+    <div class="wrap">
+      <div class="section-label">Work</div>
+      <h1>Products, and how they <em class="accent">got built</em>.</h1>
+      <p class="lede" style="margin: 1.5rem 0 3rem">
+        Each study is drawn from the project record — every claim points at a file, a commit or a dated artefact.
+        Where a decision was reversed, the reversal is kept.
+      </p>
+      {work.length > 0
+        ? <div class="grid-2">{work.map((w) => <WorkCard entry={w} />)}</div>
+        : <p class="lede">Case studies are on their way.</p>}
+    </div>
+  </section>
+</Base>

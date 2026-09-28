@@ -1,85 +1,72 @@
-# Portfolio — Andy Rewriter
+# andrewritter.me
 
-A single-page personal portfolio built with React, GSAP, Three.js, D3.js, and Lenis.
+Personal site — product development & engineering, writing, and the case studies behind the products. Built with [Astro](https://astro.build) (static output) with React islands where a page needs interaction. Deployed on Vercel.
+
+The previous site (React/GSAP/Three.js single-page portfolio) is archived at git tag `archive/react-site` and in `archive/arisme-react-site-2026-09-17.tar.gz`.
 
 ## Stack
 
-| Package | Version | Purpose |
-|---|---|---|
-| `react` + `react-dom` | 18.3.1 | UI layer |
-| `gsap` | 3.12.5 | Animations + ScrollTrigger |
-| `lenis` | 1.1.13 | Smooth scroll |
-| `three` | 0.165.0 | 3D animations (Worlds section) |
-| `simplex-noise` | 4.0.1 | Mountain terrain generation |
-| `d3` | 7.9.0 | Skills mindmap force graph |
-| `@emailjs/browser` | 4.4.1 | Contact form email delivery |
-| `vite` | 5.4.2 | Build tool |
+| Package | Purpose |
+|---|---|
+| `astro` | Static site, routing, content collections, markdown |
+| `@astrojs/react` + `react` | Islands: contact form, syndicated-posts list |
+| `@astrojs/rss` | `/rss.xml` — the feed Medium/Substack imports read |
+| `@astrojs/sitemap` | `/sitemap-index.xml` |
+| `resend` | Contact-form email, server-side in `api/send.js` |
+
+Requires **Node ≥ 22.12** (Astro 7).
 
 ## Local development
 
 ```bash
 npm install
-npm run dev
-# → http://localhost:5173
+npm run dev        # → http://localhost:4321
+npm run build      # → dist/
+npm run check      # type-check .astro/.ts
 ```
 
-## Deploy to Vercel
+`astro dev` does not run the Vercel functions in `api/`, so the contact form and the Medium/Substack list are inert locally. Use `vercel dev` if you need them.
 
-### Option A — Vercel CLI (fastest)
-```bash
-npm install -g vercel
-vercel
-# Follow prompts — framework auto-detected as Vite
+## Content
+
+| What | Where | Notes |
+|---|---|---|
+| Writing | `src/content/posts/<slug>.md` | Frontmatter: `title, date, excerpt, tags, canonical?, draft?`. Filename = URL slug. |
+| Work (case studies) | `src/content/work/<project>/index.md` | Card + editorial summary. Frontmatter: `title, tagline, role, period, status, stack, links, order, draft?` |
+| Study documents | `src/content/work/<project>/<doc>.md` | e.g. `prd.md`, `decisions.md`, `timeline.md`. Frontmatter: `title, order`. Rendered as sections under the project page. |
+| The Turn | `src/content/pages/the-turn.md` | Long-form page at `/the-turn`. |
+
+Entries with `draft: true` show in `astro dev` and are excluded from the production build.
+
+## Syndication
+
+The site is canonical. Each post is also published outward by hand:
+
+- **Medium** — *Import a story* with the post's URL (sets the canonical link back here). Medium closed its API to new integrations in Jan 2025, so there is no automated path.
+- **Substack** — paste into the editor. Substack has no publishing API.
+
+The reverse direction is automatic: `api/feed.js` reads both RSS feeds and `/writing` lists those posts with a link out.
+
+## Vercel environment variables
+
+| Variable | Used by |
+|---|---|
+| `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM` | `api/send.js` |
+| `MEDIUM_FEED_URL` (`https://medium.com/feed/@<handle>`) | `api/feed.js` — optional |
+| `SUBSTACK_FEED_URL` (`https://<pub>.substack.com/feed`) | `api/feed.js` — optional |
+
+## Layout
+
 ```
-
-### Option B — GitHub + Vercel Dashboard
-1. Push repo to GitHub
-2. Go to [vercel.com/new](https://vercel.com/new) → Import repository
-3. Vercel auto-detects Vite. Settings will be:
-   - **Framework preset**: Vite
-   - **Build command**: `npm run build`
-   - **Output directory**: `dist`
-   - **Install command**: `npm install`
-4. Click **Deploy**
-
-## Before going live — checklist
-
-### 1. Contact form (Resend)
-The contact form sends via a Vercel serverless function (`api/send.js`) using Resend.
-
-1. Create a free account at https://resend.com (3,000 emails/month free)
-2. Add your sending domain OR use the Resend sandbox domain (resend.dev)
-3. Copy your API key
-4. In Vercel dashboard → Settings → Environment Variables, add:
-   - `RESEND_API_KEY` = `re_xxxxxxxxxxxx`
-   - `CONTACT_TO_EMAIL` = `andy@andrewritter.me`
-   - `CONTACT_FROM` = `Portfolio <noreply@yourdomain.com>`
-
-### 2. Social links
-Open `src/components/Contact.jsx` and update the `href` values:
-```js
-const LINKS = [
-  { label: 'GitHub',   href: 'https://github.com/YOUR_USERNAME', ... },
-  { label: 'LinkedIn', href: 'https://linkedin.com/in/YOUR_USERNAME', ... },
-]
+api/            Vercel serverless functions (send, feed)
+lib/            pure helpers shared by api/ (rss parser)
+public/         static assets
+src/
+  content/      markdown collections (posts, work, pages)
+  content.config.ts
+  layouts/      Base.astro — head, header, footer
+  components/   static Astro sections and cards
+  islands/      React components hydrated on the client
+  pages/        routes
+  styles/       global.css — tokens, reset, prose
 ```
-
-### 3. Personal details
-- `src/components/Navbar.jsx` — logo text
-- `src/components/Hero.jsx` — headline, subline, tags
-- `src/components/About.jsx` — bio copy, stats
-- `src/data/mindmap.js` — skills and experience weights
-- `public/favicon.svg` — favicon
-
-## Personalisation
-
-### Mindmap skills (`src/data/mindmap.js`)
-- Add/edit entries in `NODES` — each needs `id`, `label`, `domain`, `group`, `weight` (1–5)
-- Adjust visual config in `GRAPH_CONFIG` — colours, forces, zoom limits
-- Add cross-discipline connections in `CROSS_LINKS` for phase 3
-
-### Worlds section (`src/components/Worlds.jsx`)
-- Edit the `WORLDS` array — body copy, tags, colours per domain
-
-### Stats banner (`src/components/About.jsx`)
-- Edit `ALL_STATS` — the 12 stats rotate across 4 visible slots every 4.5 seconds

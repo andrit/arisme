@@ -1,0 +1,21 @@
+---
+import type { CollectionEntry } from 'astro:content'
+interface Props { entry: CollectionEntry<'work'> }
+const { entry } = Astro.props
+const { title, tagline, role, period, status, stack, draft } = entry.data
+---
+<a class="card" href={`/work/${entry.id}`}>
+  <div class="meta">
+    <span class="mono">{period}</span>
+    <span class="mono">{status}</span>
+    {draft && <span class="mono" style="color: var(--ember)">draft</span>}
+  </div>
+  <h3>{title}</h3>
+  <p>{tagline}</p>
+  <p class="mono" style="margin-top: 0.75rem">{role}</p>
+  {stack.length > 0 && (
+    <div class="tags">
+      {stack.map((s) => <span class="tag">{s}</span>)}
+    </div>
+  )}
+</a>
