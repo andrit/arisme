@@ -1,4 +1,7 @@
 {
+  "framework": "astro",
+  "buildCommand": "astro build",
+  "outputDirectory": "dist",
   "headers": [
     {
       "source": "/(.*)",
