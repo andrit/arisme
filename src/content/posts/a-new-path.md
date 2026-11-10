@@ -31,7 +31,7 @@ There is a fourth thing, and it is not a fourth trade. The three above are what 
 
 ## The next layer
 
-Computing has only ever done one thing. It builds the next abstraction on top of the last, and hands it to you through an interface. Assembly hid the machine. The compiler hid the assembly. The framework hid the compiler. Every layer was a new interface onto the one below, and every one let you decide more and type less.
+Invariably, computing evolves by the same fundamental principle: it builds the next abstraction on the last and hands it to you through an interface. Assembly hid the machine. The compiler hid the assembly. The framework hid the compiler. Every layer was a new interface onto the one below, and every one let you decide more and type less.
 
 The language model is the next layer. It hides the framework. New hardware is shifting the floor beneath it, and plain language has become a way to program — so the interface for *making* software has changed as much as the software has. Nothing is ending here. The abstraction took one more step, and this time it stepped onto the interface itself: the thing I spent a decade learning to read.
 
